@@ -376,14 +376,17 @@ window.addEventListener('DOMContentLoaded', (event) => {
             this.strokeColor = strokeColor
         }
         draw() {
-            this.alpha = .1+(this.z)
+            this.alpha = (this.z)
             canvas_context.globalAlpha =  this.alpha;
+            let grad = canvas_context.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius*1.1);
+            grad.addColorStop(0, this.color)
+            grad.addColorStop(1, "transparent")
             canvas_context.lineWidth = this.strokeWidth
             canvas_context.strokeStyle = this.color
             canvas_context.beginPath();
             if (this.radius > 0) {
                 canvas_context.arc(this.x, this.y, this.radius, 0, (Math.PI * 2), true)
-                canvas_context.fillStyle = this.color
+                canvas_context.fillStyle = grad
                 canvas_context.fill()
                 // canvas_context.stroke();
             } else {
@@ -1161,7 +1164,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         canvas.style.background = style
         window.setInterval(function () {
             main()
-        }, 100)
+        }, 1000)
         document.addEventListener('keydown', (event) => {
             keysPressed[event.key] = true;
         });
@@ -1291,7 +1294,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.angle1+=(Math.PI*2)/60
                 let point = new ZPoint(this.center.x+(Math.cos(this.angle1)*200), this.center.y+(Math.sin(this.angle1)*200), this.center.z)
                 for(let t = 0;t<30;t++){
-                    let pointx = new Circle(point.x + (Math.cos(this.angle2)*60), point.y+ (Math.sin(this.angle2)*60), point.z+((t-30)/60), 12, "#FFFFFF88")
+                    let pointx = new Circle(point.x + (Math.cos(this.angle2)*130), point.y+ (Math.sin(this.angle2)*130), point.z+((t-30)/60), 12, "#FFFFFF")
                     this.points.push(pointx)
                 this.angle2+=(Math.PI*2)/30
 
@@ -1308,30 +1311,57 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 this.angle2 = ingo
                 this.angle1+=(Math.PI*2)/60
                 let point = new ZPoint(this.center.x+(Math.cos(this.angle1)*200)*this.xconst, this.center.y+(Math.sin(this.angle1)*200)*this.yconst, this.center.z)
-                for(let t = 0;t<60;t++){
-                    let pointx = new Circle(point.x + (Math.cos(this.angle2)*60)*this.xconst, point.y+ (Math.sin(this.angle2)*60)*this.yconst, point.z+((t-30)/60), 12, "#FFFFFF88")
+                for(let t = 0;t<30;t++){
+                    let pointx = new Circle(point.x + (Math.cos(this.angle2)*60), point.y+ (Math.sin(this.angle2)*60),((t-15)/60), 17, "#FFFFFF")
                     this.points.push(pointx)
-                this.angle2+=(Math.PI*2)/60
+                this.angle2+=(Math.PI*2)/30
 
                 }
             }
-            for(let t = 0;t<this.points.length;t++)[
+            this.angle1 = 0
+            // for(let k = 0;k<20;k++){
+            //     this.angle1+=(Math.PI*2)/60
+
+            // }
+            for(let t = 0;t<this.points.length;t++){
                 this.points[t].draw()
-            ]
+        }
+            for(let t = 1;t<this.points.length;t++){
+                let link = new LineOP(this.points[t], this.points[t-1], "#FFFFFF55", 3.5)
+                link.draw()
+            }
         }
     }
 
 
     let spin = 0
     let pink = new Donut()
+    let flip = -1
+    let freak = 0
     function main() {
         canvas_context.clearRect(0, 0, canvas.width, canvas.height)  // refreshes the image
         gamepadAPI.update() //checks for button presses/stick movement on the connected controller)
         // // game code goes here
-        pink.draw(spin)
-        spin+=.01
-        pink.xconst = Math.cos(spin)
-        // pink.yconst = Math.sin(spin)
-        pink.angle1+=.1
+        if(flip == -1){
+            pink.draw(Math.PI)
+            spin+=.09
+            pink.xconst = Math.cos(spin)
+            pink.angle1+=.045
+            freak+=.045
+            if(freak > Math.PI*.5){
+                flip*=-1
+                freak = 0
+            }
+        }else{
+        pink.draw(Math.PI)
+        spin+=.09
+        pink.yconst = Math.cos(spin)
+        pink.angle1+=.045
+        freak+=.045
+        if(freak > Math.PI*.5){
+            flip*=-1
+            freak = 0
+        }
+        }
     }
 })
