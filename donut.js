@@ -1164,7 +1164,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         canvas.style.background = style
         window.setInterval(function () {
             main()
-        }, 1000)
+        }, 10)
         document.addEventListener('keydown', (event) => {
             keysPressed[event.key] = true;
         });
@@ -1285,9 +1285,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
     
 
     class Donut{
-        constructor(){
-            this.center = new ZPoint(350, 350, 0)
+        constructor(x,y, color){
+            this.spin = Math.random()*.06
+            this.center = new ZPoint(x, y, 0)
+            this.color = color
             this.points = []
+            this.type = 0
+            if(Math.random()<.5){
+                this.type = 1
+            }
+            this.angle1start = Math.random()*Math.PI*2
             this.angle1 = 0
             for(let k = 0;k<60;k++){
                 this.angle2 = 0
@@ -1307,9 +1314,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
         draw(ingo){
 
             this.points = []
-            for(let k = 0;k<60;k++){
-                this.angle2 = ingo
-                this.angle1+=(Math.PI*2)/60
+            for(let k = 0;k<90;k++){
+                this.angle2 = ingo+this.angle1start
+                this.angle1+=(Math.PI*2)/90
                 let point = new ZPoint(this.center.x+(Math.cos(this.angle1)*200)*this.xconst, this.center.y+(Math.sin(this.angle1)*200)*this.yconst, this.center.z)
                 for(let t = 0;t<30;t++){
                     let pointx = new Circle(point.x + (Math.cos(this.angle2)*60), point.y+ (Math.sin(this.angle2)*60),((t-15)/60), 17, "#FFFFFF")
@@ -1318,16 +1325,16 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
                 }
             }
-            this.angle1 = 0
+            this.angle1 = this.angle1start
             // for(let k = 0;k<20;k++){
             //     this.angle1+=(Math.PI*2)/60
 
             // }
             for(let t = 0;t<this.points.length;t++){
-                this.points[t].draw()
+                // this.points[t].draw()
         }
             for(let t = 1;t<this.points.length;t++){
-                let link = new LineOP(this.points[t], this.points[t-1], "#FFFFFF55", 3.5)
+                let link = new LineOP(this.points[t], this.points[t-1], this.color, 1.5)
                 link.draw()
             }
         }
@@ -1335,33 +1342,62 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
 
     let spin = 0
-    let pink = new Donut()
+    let donuts = []
+    let pink = new Donut(350,350, "#FF00FF")
+    donuts.push(pink)
+    let red = new Donut(350, 1050, "#FF0000")
+    donuts.push(red)
+    let cyan = new Donut(1050, 1050, "#00FFFF")
+    donuts.push(cyan)
+    let yellow = new Donut(1050, 350, "#FFFF00")
+    donuts.push(yellow)
+    let green = new Donut(1750, 350, "#00FF00")
+    donuts.push(green)
+    let white = new Donut(1750, 1750, "#FFFFFF")
+    donuts.push(white)
+    let orange = new Donut(350, 1750, "#FFAA00")
+    donuts.push(orange)
+    let purple = new Donut(1050, 1750, "#AA00FF")
+    donuts.push(purple)
+    let neon = new Donut(1750, 1050, getRandomColor())
+    donuts.push(neon)
     let flip = -1
     let freak = 0
+
+    canvas_context.scale(.3,.3)
     function main() {
-        canvas_context.clearRect(0, 0, canvas.width, canvas.height)  // refreshes the image
+        canvas_context.clearRect(0, 0, canvas.width*3, canvas.height*3)  // refreshes the image
         gamepadAPI.update() //checks for button presses/stick movement on the connected controller)
         // // game code goes here
-        if(flip == -1){
-            pink.draw(Math.PI)
-            spin+=.09
-            pink.xconst = Math.cos(spin)
-            pink.angle1+=.045
-            freak+=.045
-            if(freak > Math.PI*.5){
+
+        for(let t = 0;t<donuts.length;t++){
+
+        // if(flip == -1){
+            donuts[t].draw(Math.PI)
+            spin+=donuts[t].spin
+            if(donuts[t].type == 1){
+                donuts[t].xconst = Math.cos(spin+donuts[t].angle1start)
+            }else{
+                donuts[t].yconst = Math.cos(spin+donuts[t].angle1start)
+            }
+            donuts[t].angle1+=donuts[t].spin*.2
+            freak+=donuts[t].spin*.2
+            if(freak >= (Math.PI*.5)+donuts[t].angle1start){
                 flip*=-1
                 freak = 0
             }
-        }else{
-        pink.draw(Math.PI)
-        spin+=.09
-        pink.yconst = Math.cos(spin)
-        pink.angle1+=.045
-        freak+=.045
-        if(freak > Math.PI*.5){
-            flip*=-1
-            freak = 0
-        }
-        }
+        // }else{
+        // donuts[t].draw(Math.PI)
+        // spin+=.04
+        // donuts[t].yconst = Math.cos(spin+donuts[t].angle1start)
+        // donuts[t].angle1+=.01
+        // freak+=.01
+        // if(freak >= (Math.PI*.5)+donuts[t].angle1start){
+        //     flip*=-1
+        //     freak = 0
+        // }
+        // }
     }
+}
+
 })
